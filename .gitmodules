@@ -1,0 +1,3 @@
+[submodule "assets/js/wpAlgorythmsLibraries"]
+	path = assets/js/wpAlgorythmsLibraries
+	url = git@github.com:hightemp/wpAlgorythmsLibraries.git
