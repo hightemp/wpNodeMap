@@ -20,6 +20,7 @@ window.document.addEventListener("DOMContentLoaded", function()
     
     window.fnAddBlock = function(sName, sTitle, objDOMParent, objAttributes)
     {
+        console.log(objDOMParent);
         if (window.objBlocks[sName] !== undefined)
             throw "Block "+sName+" already exists";
         window.objBlocks[sName] = new TBlock(sName, sTitle, objDOMParent, objAttributes);
