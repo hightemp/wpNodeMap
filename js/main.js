@@ -22,7 +22,7 @@ window.document.addEventListener("DOMContentLoaded", function()
     {
         if (window.objBlocks[sName] !== undefined)
             throw "Block "+sName+" already exists";
-        window.objBlocks[sName] = new TBlock(sName, sTitle, objAttributes);
+        window.objBlocks[sName] = new TBlock(sName, sTitle, objDOMParent, objAttributes);
     }
     
     window.fnAddBlock("test", "Test block", document.body);
