@@ -1,4 +1,0 @@
-[submodule "wpAlgorythmsLibraries"]
-	path = assets/js/wpAlgorythmsLibraries
-	url = https://github.com/hightemp/wpAlgorythmsLibraries.git
-	branch = master
