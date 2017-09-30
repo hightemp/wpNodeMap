@@ -1,3 +1,3 @@
 # wpNodeMap
 
-[https://hightemp.github.io/wpNodeMap/]Site link
+https://hightemp.github.io/wpNodeMap/
