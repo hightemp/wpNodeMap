@@ -1,0 +1,19 @@
+
+body {
+    /*overflow: hidden;
+    width: 5000px;
+    height: 5000px;*/
+}
+
+.block {
+    position: absolute;
+    background: #ddd;
+    min-width: 200px;
+    min-height: 200px;
+    padding: 5px;
+}
+
+.block .title {
+    cursor: move;
+    text-align: center;
+}
