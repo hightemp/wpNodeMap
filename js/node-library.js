@@ -65,20 +65,97 @@ class TCanvas {
 }
 
 class TConnection {
-  constructor() {
+  static fnConnect(objInBlock, sInPortName, objOutBlock, sOutPortName) {
+    let objConnection = {InConnection: [], OutConnection: []};
 
   }
+}
 
+// {InConnection: [], OutConnection: []}
+TConnection.aConnectionsCollection = [];
+
+class TPort {
+  constructor(sName, fnOnConnect) {
+    this.sName = sName;
+    this.fnOnConnect = fnOnConnect;
+  }
 }
 
 class TBlock {
-  constructor() {
+  constructor(sName) {
+    if (!sName)
+      throw "Block must have name";
 
+    if (TBlock.fnGetBlockByName(sName))
+      throw "Block must unique name";
+
+    TBlock.aBlocksCollection.push(this);
+
+    this.iPositionX = 0;
+    this.iPositionY = 0;
+
+    this.sName = sName;
+
+    this.aOutputPortsCollection = [];
+    this.aInputPortsCollection = [];
+  }
+
+  static fnGetBlockByName(sName) {
+    let objResult;
+
+    TBlock.aBlocksCollection.some(function(objItem, iKey) {
+      if (objItem.sName == sName) {
+        objResult = objItem;
+        return true;
+      } else
+        return false;
+    });
+
+    return objResult;
+  }
+
+  fnGetPortByName(sName) {
+    let objResult;
+
+    this.aOutputPortsCollection.some(function(objItem, iKey) {
+      if (objItem.sName == sName) {
+        objResult = objItem;
+        return true;
+      } else
+        return false;
+    });
+
+    if (!objResult)
+      this.aInputPortsCollection.some(function() {
+        if (objItem.sName == sName) {
+          objResult = objItem;
+          return true;
+        } else
+          return false;
+      });
+
+    return objResult;
   }
 }
 
-class TTextBlock {
+TBlock.aBlocksCollection = [];
 
+class TOutputTextBlock extends TBlock {
+  constructor(sName) {
+    super(sName);
+
+    this.aOutputPortsCollection.push(new TPort("TextOutput"));
+    this.sText = '';
+  }
+}
+
+class TInputTextBlock extends TBlock {
+  constructor(sName) {
+    super(sName);
+
+    this.aInputPortsCollection.push(new TPort("TextInput"));
+    this.sText = '';
+  }
 }
 
 /*
@@ -183,6 +260,11 @@ window.fnGetCenterCoordinates = function()
 window.document.addEventListener("DOMContentLoaded", function()
 {
   NodeLibrary.fnInitialize();
+
+  objOutputTextBlock = new TOutputTextBlock("Text output Block");
+  objInputTextBlock = new TInputTextBlock("Text input Block");
+
+  TConnection.fnConnect(objOutputTextBlock, "TextOutput", objInputTextBlock, "TextInput");
 
   console.log("NodeLibrary.objCanvas", NodeLibrary.objCanvas);
 
