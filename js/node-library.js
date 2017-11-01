@@ -2,13 +2,17 @@
 
 class NodeLibrary {
   static fnInitialize() {
-    NodeLibrary.objCanvas = new TCanvas();
   }
 }
 
 class TCanvas {
-  constructor() {
+  constructor(objParent) {
     var self = this;
+
+    this.sID = Date.now();
+    this.objParent = objParent;
+
+    TCanvas.aCanvasCollection.push(this);
 
     this.iWidth = 5000;
     this.iHeight = 5000;
@@ -18,8 +22,8 @@ class TCanvas {
 
     this.fnUpdateCenterCoordinates();
 
-    document.body.insertAdjacentHTML('beforeEnd', "<div id='root-block'></div>");
-    this.objDOMRootElement = document.getElementById('root-block');
+    objParent.insertAdjacentHTML('beforeEnd', `<div id='${this.sID}'></div>`);
+    this.objDOMRootElement = document.getElementById(this.sID);
     this.objDOMRootElement.style.width = `${this.iWidth}px`;
     this.objDOMRootElement.style.height = `${this.iHeight}px`;
 
@@ -29,18 +33,6 @@ class TCanvas {
         height="${this.iHeight}">
       </svg>`);
     this.objSVGElement = document.getElementById('svg');
-    this.objSVGElement.addEventListener("mousedown", function(objEvent) {
-      console.log(objEvent);
-      self.objSVGElement.insertAdjacentHTML('beforeEnd', `
-      <rect
-        x="${objEvent.offsetX}"
-        y="${objEvent.offsetY}"
-        width="100"
-        height="100"
-        fill="#95B3D7">
-      </rect>`);
-    },
-    false);
 
     this.fnSetViewAtCenter();
 
@@ -60,14 +52,21 @@ class TCanvas {
         document.body.scrollTop = self.iCenterY;
     }, 1);
   }
-
-
 }
 
-class TConnection {
-  static fnConnect(objInBlock, sInPortName, objOutBlock, sOutPortName) {
-    let objConnection = {InConnection: [], OutConnection: []};
+TCanvas.aCanvasCollection = [];
 
+class TConnection {
+  constructor(objInBlock, sInPortName, objOutBlock, sOutPortName) {
+    this.sID = Date.now();
+    this.aIn = [];
+    this.aOut = [];
+
+    TConnection.aConnectionsCollection.push(this);
+  }
+
+  static fnConnect(objInBlock, sInPortName, objOutBlock, sOutPortName) {
+    let objConnection = new TConnection(objInBlock, sInPortName, objOutBlock, sOutPortName); //{InConnection: [], OutConnection: []};
   }
 }
 
@@ -82,12 +81,12 @@ class TPort {
 }
 
 class TBlock {
-  constructor(sName) {
+  constructor(objParent, sName) {
     if (!sName)
       throw "Block must have name";
 
-    if (TBlock.fnGetBlockByName(sName))
-      throw "Block must unique name";
+    this.sID = Date.now();
+    this.objParent = objParent;
 
     TBlock.aBlocksCollection.push(this);
 
@@ -98,6 +97,14 @@ class TBlock {
 
     this.aOutputPortsCollection = [];
     this.aInputPortsCollection = [];
+  }
+
+  fnShow() {
+
+  }
+
+  fnHide() {
+    document.getElementById(this.sID).remove();
   }
 
   static fnGetBlockByName(sName) {
@@ -141,8 +148,8 @@ class TBlock {
 TBlock.aBlocksCollection = [];
 
 class TOutputTextBlock extends TBlock {
-  constructor(sName) {
-    super(sName);
+  constructor(objParent, sName) {
+    super(objParent, sName);
 
     this.aOutputPortsCollection.push(new TPort("TextOutput"));
     this.sText = '';
@@ -150,8 +157,8 @@ class TOutputTextBlock extends TBlock {
 }
 
 class TInputTextBlock extends TBlock {
-  constructor(sName) {
-    super(sName);
+  constructor(objParent, sName) {
+    super(objParent, sName);
 
     this.aInputPortsCollection.push(new TPort("TextInput"));
     this.sText = '';
@@ -261,12 +268,21 @@ window.document.addEventListener("DOMContentLoaded", function()
 {
   NodeLibrary.fnInitialize();
 
-  objOutputTextBlock = new TOutputTextBlock("Text output Block");
-  objInputTextBlock = new TInputTextBlock("Text input Block");
+  document.body.insertAdjacentHTML('beforeEnd', `
+    <div class='ui-tabs'></div>
+    <div class='ui-tabs-content'></div>
+  `);
+
+  let objUITabsContent = document.body.querySelector('.ui-tabs-content');
+
+  let firstCanvas = new TCanvas(objUITabsContent);
+
+  objOutputTextBlock = new TOutputTextBlock(objUITabsContent, "Text output Block");
+  objInputTextBlock = new TInputTextBlock(objUITabsContent, "Text input Block");
 
   TConnection.fnConnect(objOutputTextBlock, "TextOutput", objInputTextBlock, "TextInput");
 
-  console.log("NodeLibrary.objCanvas", NodeLibrary.objCanvas);
+  console.log("NodeLibrary.objCanvas", NodeLibrary.TCanvas);
 
   return;
 /*
