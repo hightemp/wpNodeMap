@@ -1,15 +1,192 @@
 "use strickt";
 
-class NodeLibrary {
-  static fnInitialize() {
+function TRandom() {
+  var aNumbers = [];
+
+  function getRandomID() {
+    let min = 0x11111111;
+    let max = 0xFFFFFFFF;
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  return {
+    getRandomID: getRandomID
   }
 }
 
-class TCanvas {
+var objRandom = new TRandom();
+
+function TDocumentBody() {
+  var aChildren = [];
+  var objElement = document.body;
+  var sID = objRandom.getRandomID();
+
+  console.log(objElement, document.body);
+
+  function fnRemoveChild(in_objElement) {
+    objElement.removeChild(in_objElement);
+  }
+
+  function fnAddChild(in_objElement) {
+    objElement.appendChild(in_objElement)
+  }
+
+  function fnAddHTML(in_sHTML) {
+    console.log(objElement);
+    objElement.insertAdjacentHTML("beforeEnd", in_sHTML);
+  }
+
+  return {
+    fnRemoveChild: fnRemoveChild,
+    fnAddChild: fnAddChild,
+    fnAddHTML: fnAddHTML
+  }
+}
+
+function TTabView(in_objParent) {
+  var aTabs = [];
+  var objElement;
+  var iSelectedTab = 0;
+  var sID = objRandom.getRandomID();
+
+  fnShow();
+  fnUpdate();
+
+  function fnShow() {
+    fnHide();
+    in_objParent.fnAddHTML(`
+      <div id='${sID}'>
+        <div class='ui-tabs'></div>
+        <div class='ui-tabs-content'></div>
+      </div>
+    `);
+    objElement = document.getElementById(sID);
+  }
+
+  function fnHide() {
+    if (objElement)
+      objElement.remove();
+  }
+
+  function fnUpdate() {
+    for (let iKey in aTabs) {
+      document.getElementById(aTabs[iKey].sID).className = "";
+      document.getElementById(aTabs[iKey].sID+"-content").style.display = "none";
+    }
+
+    if (iSelectedTab in aTabs) {
+      document.getElementById(aTabs[iSelectedTab].sID).className = "tab-active";
+      document.getElementById(aTabs[iSelectedTab].sID+"-content").style.display = "block";
+    }
+  }
+
+  function fnSelectTab(in_iTabNumber) {
+    iSelectedTab = in_iTabNumber;
+
+    fnUpdate();
+  }
+
+  function fnGetNumberByID(in_sID) {
+    let iResult = 0;
+    for (let iKey in aTabs) {
+      if (aTabs[iKey].sID == in_sID)
+        iResult = iKey;
+    }
+    return iResult;
+  }
+
+  function fnAddTab(in_sName, in_sHTML) {
+    let objTab = {
+      sName: in_sName,
+      sID: objRandom.getRandomID()
+    }
+    aTabs.push(objTab);
+
+    var objUITabsContent = objElement.getElementsByClassName('ui-tabs-content')[0];
+    var objUITabs = objElement.getElementsByClassName('ui-tabs')[0];
+
+    objUITabs.insertAdjacentHTML("beforeEnd", `
+      <div id='${objTab.sID}'>${objTab.sName}</div>
+    `);
+    objUITabsContent.insertAdjacentHTML("beforeEnd", `
+      <div id='${objTab.sID}-content'>${in_sHTML}</div>
+    `);
+
+    document.getElementById(objTab.sID).addEventListener(
+      "click",
+      function() {
+        let iNumber = fnGetNumberByID(objTab.sID);
+        console.log(iNumber);
+        fnSelectTab(iNumber);
+      }
+    );
+
+    fnUpdate();
+  }
+
+  function fnAddTabWithObject(in_sName, in_objDOMObject) {
+    let objTab = {
+      sName: in_sName,
+      sID: objRandom.getRandomID()
+    }
+    aTabs.push(objTab);
+
+    var objUITabsContent = objElement.getElementsByClassName('ui-tabs-content')[0];
+    var objUITabs = objElement.getElementsByClassName('ui-tabs')[0];
+
+    objUITabs.insertAdjacentHTML("beforeEnd", `
+      <div id='${objTab.sID}'>${objTab.sName}</div>
+    `);
+    objUITabsContent.insertAdjacentHTML("beforeEnd", `
+      <div id='${objTab.sID}-content'></div>
+    `);
+
+    var objUITabContent = document.getElementById(`${objTab.sID}-content`);
+
+    objUITabContent.appendChild(in_objDOMObject);
+
+    document.getElementById(objTab.sID).addEventListener(
+      "click",
+      function() {
+        let iNumber = fnGetNumberByID(objTab.sID);
+        console.log(iNumber);
+        fnSelectTab(iNumber);
+      }
+    );
+
+    fnUpdate();
+  }
+
+  function fnAddHTMLToTab(in_iTabNumber, in_sHTML) {
+    aTabs[in_iTabNumber].insertAdjacentHTML("beforeEnd", in_sHTML);
+  }
+
+  return {
+    fnAddTab: fnAddTab,
+    fnAddTabWithObject: fnAddTabWithObject,
+    fnSelectTab: fnSelectTab
+  }
+}
+
+function TCanvas(in_) {
+  var sID = objRandom.getRandomID();
+
+  var objDOMObject = document.createElement("canvas");
+
+  function getDOMObject() {
+    return objDOMObject;
+  }
+
+  return {
+    getDOMObject: getDOMObject
+  }
+}
+
+class TCanvasClass {
   constructor(objParent) {
     var self = this;
 
-    this.sID = Date.now();
+    this.sID = objRandom.getRandomID();
     this.objParent = objParent;
 
     TCanvas.aCanvasCollection.push(this);
@@ -22,12 +199,13 @@ class TCanvas {
 
     this.fnUpdateCenterCoordinates();
 
-    objParent.insertAdjacentHTML('beforeEnd', `<div id='${this.sID}'></div>`);
-    this.objDOMRootElement = document.getElementById(this.sID);
-    this.objDOMRootElement.style.width = `${this.iWidth}px`;
-    this.objDOMRootElement.style.height = `${this.iHeight}px`;
+    //objParent.insertAdjacentHTML('beforeEnd', `<div id='${this.sID}'></div>`);
+    objParent.fnAddHTML(`<div id='${this.sID}'></div>`);
+    this.objDOMElement = document.getElementById(this.sID);
+    this.objDOMElement.style.width = `${this.iWidth}px`;
+    this.objDOMElement.style.height = `${this.iHeight}px`;
 
-    this.objDOMRootElement.insertAdjacentHTML('beforeEnd', `
+    this.objDOMElement.insertAdjacentHTML('beforeEnd', `
       <svg id='svg' xmlns="http://www.w3.org/2000/svg"
         width="${this.iWidth}"
         height="${this.iHeight}">
@@ -266,23 +444,24 @@ window.fnGetCenterCoordinates = function()
 
 window.document.addEventListener("DOMContentLoaded", function()
 {
-  NodeLibrary.fnInitialize();
+  var objDocumentBody = new TDocumentBody();
 
-  document.body.insertAdjacentHTML('beforeEnd', `
-    <div class='ui-tabs'></div>
-    <div class='ui-tabs-content'></div>
-  `);
+  let objCanvas = new TCanvas();
 
-  let objUITabsContent = document.body.querySelector('.ui-tabs-content');
+  let objUITabsContent = new TTabView(objDocumentBody);
+  objUITabsContent.fnAddTab('tab 1', '<a>link 1</a>');
+  objUITabsContent.fnAddTabWithObject('tab 2', objCanvas.getDOMObject());
 
-  let firstCanvas = new TCanvas(objUITabsContent);
+  objUITabsContent.fnSelectTab(1);
+
+  //console.log(objUITabsContent);
+
+  //let firstCanvas = new TCanvas(objUITabsContent);
 
   objOutputTextBlock = new TOutputTextBlock(objUITabsContent, "Text output Block");
   objInputTextBlock = new TInputTextBlock(objUITabsContent, "Text input Block");
 
   TConnection.fnConnect(objOutputTextBlock, "TextOutput", objInputTextBlock, "TextInput");
-
-  console.log("NodeLibrary.objCanvas", NodeLibrary.TCanvas);
 
   return;
 /*
