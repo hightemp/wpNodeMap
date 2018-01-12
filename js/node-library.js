@@ -43,9 +43,9 @@ function TDocumentBody() {
 }
 
 function TTabView(in_objParent) {
-  var aTabs = [];
+  var aTabs = {};
   var objElement;
-  var iSelectedTabID = 0;
+  var sSelectedTabID = '';
   var sID = objRandom.getRandomID();
 
   fnShow();
@@ -69,29 +69,33 @@ function TTabView(in_objParent) {
 
   function fnUpdate() {
     for (let iKey in aTabs) {
-      document.getElementById(aTabs[iKey].sID).className = "";
-      document.getElementById(aTabs[iKey].sID+"-content").style.display = "none";
+      document.getElementById(iKey).className = "";
+      document.getElementById(iKey+"-content").style.display = "none";
     }
 
-    if (iSelectedTabID in aTabs) {
-      document.getElementById(aTabs[iSelectedTabID].sID).className = "tab-active";
-      document.getElementById(aTabs[iSelectedTabID].sID+"-content").style.display = "block";
+    if (sSelectedTabID in aTabs) {
+      document.getElementById(sSelectedTabID).className = "tab-active";
+      document.getElementById(sSelectedTabID+"-content").style.display = "block";
+    }
+  }
+
+  function fnSelectTabByID(in_sTabID) {
+    if (in_sTabID in aTabs) {
+      sSelectedTabID = in_sTabID;
+      fnUpdate();
     }
   }
 
   function fnSelectTab(in_iTabID) {
-    iSelectedTabID = in_iTabID;
+    var iNumber = 0;
 
-    fnUpdate();
-  }
-
-  function fnGetNumberByID(in_sID) {
-    let iResult = 0;
-    for (let iKey in aTabs) {
-      if (aTabs[iKey].sID == in_sID)
-        iResult = iKey;
+    for (let sKey in aTabs) {
+      if (iNumber == in_iTabID) {
+        sSelectedTabID = sKey;
+        fnUpdate();
+        break;
+      }
     }
-    return iResult;
   }
 
   function fnAddTabWithHTML(in_sName, in_sHTML) {
@@ -99,12 +103,12 @@ function TTabView(in_objParent) {
       sName: in_sName,
       sID: objRandom.getRandomID()
     }
-    aTabs.push(objTab);
+    aTabs[objTab.sID] = objTab;
 
     var objUITabsContent = objElement.getElementsByClassName('ui-tabs-content')[0];
     var objUITabs = objElement.getElementsByClassName('ui-tabs')[0];
 
-    iSelectedTabID = aTabs.length-1;
+    sSelectedTabID = objTab.sID;
 
     objUITabs.insertAdjacentHTML("beforeEnd", `
       <div id='${objTab.sID}'>${objTab.sName}</div>
@@ -116,9 +120,7 @@ function TTabView(in_objParent) {
     document.getElementById(objTab.sID).addEventListener(
       "click",
       function() {
-        let iNumber = fnGetNumberByID(objTab.sID);
-        console.log(iNumber);
-        fnSelectTab(iNumber);
+        fnSelectTabByID(objTab.sID);
       }
     );
 
@@ -130,12 +132,12 @@ function TTabView(in_objParent) {
       sName: in_sName,
       sID: objRandom.getRandomID()
     }
-    aTabs.push(objTab);
+    aTabs[objTab.sID] = objTab;
 
     var objUITabsContent = objElement.getElementsByClassName('ui-tabs-content')[0];
     var objUITabs = objElement.getElementsByClassName('ui-tabs')[0];
 
-    iSelectedTabID = aTabs.length-1;
+    sSelectedTabID = objTab.sID;
 
     objUITabs.insertAdjacentHTML("beforeEnd", `
       <div id='${objTab.sID}'>${objTab.sName}</div>
@@ -151,8 +153,7 @@ function TTabView(in_objParent) {
     document.getElementById(objTab.sID).addEventListener(
       "click",
       function() {
-        let iNumber = fnGetNumberByID(objTab.sID);
-        fnSelectTab(iNumber);
+        fnSelectTabByID(objTab.sID);
       }
     );
 
@@ -164,14 +165,25 @@ function TTabView(in_objParent) {
   }
 
   function fnRemoveTab(in_iTabID) {
-    document.getElementById(aTabs[in_iTabID].sID).remove();
-    document.getElementById(aTabs[in_iTabID].sID+"-content").remove();
+    var iNumber = 0;
 
-    aTabs[in_iTabID] = null;
-    aTabs.splice(in_iTabID, 1);
+    for (let sKey in aTabs) {
+      if (iNumber == in_iTabID) {
+        fnRemoveTabByID(sKey);
 
-    if (iSelectedTabID == in_iTabID)
-      iSelectedTabID = 0;
+        break;
+      }
+    }
+  }
+
+  function fnRemoveTabByID(in_sTabID) {
+    document.getElementById(in_sTabID).remove();
+    document.getElementById(in_sTabID+"-content").remove();
+
+    delete aTabs[in_sTabID];
+
+    if (sSelectedTabID == in_sTabID)
+      sSelectedTabID = Object.keys(aTabs)[0];
 
     fnUpdate();
   }
@@ -179,7 +191,9 @@ function TTabView(in_objParent) {
   return {
     fnAddTabWithHTML: fnAddTabWithHTML,
     fnAddTabWithObject: fnAddTabWithObject,
+    fnRemoveTabByID: fnRemoveTabByID,
     fnRemoveTab: fnRemoveTab,
+    fnSelectTabByID: fnSelectTabByID,
     fnSelectTab: fnSelectTab
   }
 }
@@ -188,6 +202,7 @@ function TCanvas(in_) {
   var sID = objRandom.getRandomID();
 
   var objDOMObject = document.createElement("canvas");
+  objDOMObject.style="border:1px solid black";
 
   function getDOMObject() {
     return objDOMObject;
@@ -468,7 +483,7 @@ window.document.addEventListener("DOMContentLoaded", function()
   objUITabsContent.fnAddTabWithHTML('tab 1', '<a>link 1</a>');
   objUITabsContent.fnAddTabWithObject('tab 2', objCanvas.getDOMObject());
 
-  objUITabsContent.fnRemoveTab(0);
+  //objUITabsContent.fnRemoveTab(0);
   //let firstCanvas = new TCanvas(objUITabsContent);
 
   objOutputTextBlock = new TOutputTextBlock(objUITabsContent, "Text output Block");
