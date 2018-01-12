@@ -1,5 +1,7 @@
 "use strickt";
 
+var objIPCRenderer = require('electron').ipcRenderer;
+
 function TRandom() {
   var aNumbers = [];
 
@@ -21,8 +23,6 @@ function TDocumentBody() {
   var objElement = document.body;
   var sID = objRandom.getRandomID();
 
-  console.log(objElement, document.body);
-
   function fnRemoveChild(in_objElement) {
     objElement.removeChild(in_objElement);
   }
@@ -32,7 +32,6 @@ function TDocumentBody() {
   }
 
   function fnAddHTML(in_sHTML) {
-    console.log(objElement);
     objElement.insertAdjacentHTML("beforeEnd", in_sHTML);
   }
 
@@ -46,7 +45,7 @@ function TDocumentBody() {
 function TTabView(in_objParent) {
   var aTabs = [];
   var objElement;
-  var iSelectedTab = 0;
+  var iSelectedTabID = 0;
   var sID = objRandom.getRandomID();
 
   fnShow();
@@ -74,14 +73,14 @@ function TTabView(in_objParent) {
       document.getElementById(aTabs[iKey].sID+"-content").style.display = "none";
     }
 
-    if (iSelectedTab in aTabs) {
-      document.getElementById(aTabs[iSelectedTab].sID).className = "tab-active";
-      document.getElementById(aTabs[iSelectedTab].sID+"-content").style.display = "block";
+    if (iSelectedTabID in aTabs) {
+      document.getElementById(aTabs[iSelectedTabID].sID).className = "tab-active";
+      document.getElementById(aTabs[iSelectedTabID].sID+"-content").style.display = "block";
     }
   }
 
-  function fnSelectTab(in_iTabNumber) {
-    iSelectedTab = in_iTabNumber;
+  function fnSelectTab(in_iTabID) {
+    iSelectedTabID = in_iTabID;
 
     fnUpdate();
   }
@@ -95,7 +94,7 @@ function TTabView(in_objParent) {
     return iResult;
   }
 
-  function fnAddTab(in_sName, in_sHTML) {
+  function fnAddTabWithHTML(in_sName, in_sHTML) {
     let objTab = {
       sName: in_sName,
       sID: objRandom.getRandomID()
@@ -104,6 +103,8 @@ function TTabView(in_objParent) {
 
     var objUITabsContent = objElement.getElementsByClassName('ui-tabs-content')[0];
     var objUITabs = objElement.getElementsByClassName('ui-tabs')[0];
+
+    iSelectedTabID = aTabs.length-1;
 
     objUITabs.insertAdjacentHTML("beforeEnd", `
       <div id='${objTab.sID}'>${objTab.sName}</div>
@@ -134,6 +135,8 @@ function TTabView(in_objParent) {
     var objUITabsContent = objElement.getElementsByClassName('ui-tabs-content')[0];
     var objUITabs = objElement.getElementsByClassName('ui-tabs')[0];
 
+    iSelectedTabID = aTabs.length-1;
+
     objUITabs.insertAdjacentHTML("beforeEnd", `
       <div id='${objTab.sID}'>${objTab.sName}</div>
     `);
@@ -149,7 +152,6 @@ function TTabView(in_objParent) {
       "click",
       function() {
         let iNumber = fnGetNumberByID(objTab.sID);
-        console.log(iNumber);
         fnSelectTab(iNumber);
       }
     );
@@ -157,13 +159,27 @@ function TTabView(in_objParent) {
     fnUpdate();
   }
 
-  function fnAddHTMLToTab(in_iTabNumber, in_sHTML) {
-    aTabs[in_iTabNumber].insertAdjacentHTML("beforeEnd", in_sHTML);
+  function fnAddHTMLToTab(in_iTabID, in_sHTML) {
+    aTabs[in_iTabID].insertAdjacentHTML("beforeEnd", in_sHTML);
+  }
+
+  function fnRemoveTab(in_iTabID) {
+    document.getElementById(aTabs[in_iTabID].sID).remove();
+    document.getElementById(aTabs[in_iTabID].sID+"-content").remove();
+
+    aTabs[in_iTabID] = null;
+    aTabs.splice(in_iTabID, 1);
+
+    if (iSelectedTabID == in_iTabID)
+      iSelectedTabID = 0;
+
+    fnUpdate();
   }
 
   return {
-    fnAddTab: fnAddTab,
+    fnAddTabWithHTML: fnAddTabWithHTML,
     fnAddTabWithObject: fnAddTabWithObject,
+    fnRemoveTab: fnRemoveTab,
     fnSelectTab: fnSelectTab
   }
 }
@@ -449,13 +465,10 @@ window.document.addEventListener("DOMContentLoaded", function()
   let objCanvas = new TCanvas();
 
   let objUITabsContent = new TTabView(objDocumentBody);
-  objUITabsContent.fnAddTab('tab 1', '<a>link 1</a>');
+  objUITabsContent.fnAddTabWithHTML('tab 1', '<a>link 1</a>');
   objUITabsContent.fnAddTabWithObject('tab 2', objCanvas.getDOMObject());
 
-  objUITabsContent.fnSelectTab(1);
-
-  //console.log(objUITabsContent);
-
+  objUITabsContent.fnRemoveTab(0);
   //let firstCanvas = new TCanvas(objUITabsContent);
 
   objOutputTextBlock = new TOutputTextBlock(objUITabsContent, "Text output Block");

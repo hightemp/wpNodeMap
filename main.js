@@ -1,13 +1,10 @@
 
-const electron = require('electron');
+const objElectron = require('electron');
 
-const objApplication = electron.app
+const objApplication = objElectron.app;
 // Module to create native browser window.
-const TBrowserWindow = electron.BrowserWindow
-
-const path = require('path')
-const url = require('url')
-
+const TBrowserWindow = objElectron.BrowserWindow;
+const objMenu = objElectron.Menu;
 
 let objMainWindow = null;
 
@@ -26,7 +23,8 @@ function fnCreateWindow() {
 
 	objMainWindow.on('closed', () =>
   {
-		mainWindow = null;
+		objMainWindow = null;
+    objApplication.quit()
 	});
 }
 
