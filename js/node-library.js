@@ -198,10 +198,14 @@ function TTabView(in_objParent) {
   }
 }
 
-function TCanvas(in_) {
+function TCanvas() {
   var sID = objRandom.getRandomID();
 
   var objDOMObject = document.createElement("canvas");
+
+  objDOMObject.width = 2500;
+  objDOMObject.height = 2500;
+  
   objDOMObject.style="border:1px solid black";
 
   function getDOMObject() {

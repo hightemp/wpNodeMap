@@ -1,5 +1,6 @@
 
-body {
+body, html {
+  overflow: hidden;
     /*overflow: hidden;
     width: 5000px;
     height: 5000px;
@@ -32,20 +33,20 @@ body {
   height: 100%;
   min-width: 300px;
   min-height: 300px;
-  max-height: 700px;
+  max-height: 650px;
   border: 1px solid black;
   overflow: scroll;
 }
 
 .block {
-    position: absolute;
-    background: #ddd;
-    min-width: 200px;
-    min-height: 200px;
-    padding: 5px;
+  position: absolute;
+  background: #ddd;
+  min-width: 200px;
+  min-height: 200px;
+  padding: 5px;
 }
 
 .block .title {
-    cursor: move;
-    text-align: center;
+  cursor: move;
+  text-align: center;
 }

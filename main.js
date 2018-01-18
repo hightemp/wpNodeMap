@@ -1,5 +1,6 @@
 
 const objElectron = require('electron');
+const objIPC = objElectron.ipcMain;;
 
 const objApplication = objElectron.app;
 // Module to create native browser window.
@@ -31,6 +32,10 @@ function fnCreateWindow() {
 objApplication.on('ready', () =>
 {
   fnCreateWindow();
+
+  objIPC.on('close-main-window', function () {
+      app.quit();
+  });
 });
 
 objApplication.on('window-all-closed', function () {
