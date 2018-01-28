@@ -203,9 +203,9 @@ function TCanvas() {
 
   var objDOMObject = document.createElement("canvas");
 
-  objDOMObject.width = 2500;
-  objDOMObject.height = 2500;
-  
+  objDOMObject.width = 5000;
+  objDOMObject.height = 5000;
+
   objDOMObject.style="border:1px solid black";
 
   function getDOMObject() {
@@ -495,6 +495,7 @@ window.document.addEventListener("DOMContentLoaded", function()
 
   TConnection.fnConnect(objOutputTextBlock, "TextOutput", objInputTextBlock, "TextInput");
 
+  objIPCRenderer.send('save');
   return;
 /*
   document.body.insertAdjacentHTML('beforeEnd', "<div id='root-block'></div>");

@@ -1,19 +1,27 @@
 
+const objPath = require('path')
+
 const objElectron = require('electron');
-const objIPC = objElectron.ipcMain;;
+const objIPC = objElectron.ipcMain;
 
 const objApplication = objElectron.app;
 // Module to create native browser window.
 const TBrowserWindow = objElectron.BrowserWindow;
+const TTray = objElectron.Tray;
 const objMenu = objElectron.Menu;
 
 let objMainWindow = null;
+let objTray = null;
+
+function fnCreateTray() {
+  objTray = new TTray(objPath.join(__dirname, "icon.png"));
+}
 
 function fnCreateWindow() {
   objMainWindow = new TBrowserWindow({
-		titleBarStyle: 'hidden',
+		titleBarStyle: 'default',
 		title: '',
-		width: 1000,
+		width: 700,
 		height: 700,
 		maximizable: true,
 		minimizable: true,
@@ -31,11 +39,16 @@ function fnCreateWindow() {
 
 objApplication.on('ready', () =>
 {
+  fnCreateTray();
   fnCreateWindow();
 
   objIPC.on('close-main-window', function () {
       app.quit();
   });
+
+  objIPC.on('save', function() {
+    console.log('save');
+  })
 });
 
 objApplication.on('window-all-closed', function () {
