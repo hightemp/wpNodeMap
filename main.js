@@ -14,7 +14,11 @@ let objMainWindow = null;
 let objTray = null;
 
 function fnCreateTray() {
-  objTray = new TTray(objPath.join(__dirname, "icon.png"));
+  objTray = new TTray(
+    objPath.join(__dirname,
+      objPath.join("images", "icon.png")
+    )
+  );
 }
 
 function fnCreateWindow() {

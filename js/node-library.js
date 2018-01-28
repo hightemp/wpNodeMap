@@ -203,10 +203,18 @@ function TCanvas() {
 
   var objDOMObject = document.createElement("canvas");
 
-  objDOMObject.width = 5000;
-  objDOMObject.height = 5000;
+  objDOMObject.width = 1000;
+  objDOMObject.height = 1000;
 
   objDOMObject.style="border:1px solid black";
+
+  var objContext = objDOMObject.getContext("2d");
+  for (let x=0; x<objDOMObject.width; x++) {
+    for (let y=0; y<objDOMObject.height; y++) {
+      objContext.fillStyle = "#ddd";
+      objContext.fillRect(x, y, x+1, y+1);
+    }
+  }
 
   function getDOMObject() {
     return objDOMObject;

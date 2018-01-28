@@ -25,6 +25,7 @@ body, html {
   display: inline-block;
   text-align: center;
   cursor: pointer;
+  background: #ddd;
 }
 
 .ui-tabs .tab-active {
@@ -34,9 +35,12 @@ body, html {
 .ui-tabs-content {
   width: 100%;
   height: 100%;
+  min-height: 100%;
+  /*
   min-width: 300px;
   min-height: 300px;
-  /*max-height: 650px;*/
+  max-height: 650px;
+  */
   border: 1px solid black;
   overflow: scroll;
 }
