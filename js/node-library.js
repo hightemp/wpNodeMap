@@ -198,6 +198,7 @@ function TTabView(in_objParent) {
   }
 }
 
+/*
 function TCanvas() {
   var sID = objRandom.getRandomID();
 
@@ -296,6 +297,13 @@ class TConnection {
 
 // {InConnection: [], OutConnection: []}
 TConnection.aConnectionsCollection = [];
+*/
+
+function TBlockManager() {
+
+}
+
+var objBlockManager = new TBlockManager();
 
 class TPort {
   constructor(sName, fnOnConnect) {
@@ -492,11 +500,11 @@ window.document.addEventListener("DOMContentLoaded", function()
 {
   var objDocumentBody = new TDocumentBody();
 
-  let objCanvas = new TCanvas();
+  //let objCanvas = new TCanvas();
 
   let objUITabsContent = new TTabView(objDocumentBody);
   objUITabsContent.fnAddTabWithHTML('tab 1', '<a>link 1</a>');
-  objUITabsContent.fnAddTabWithObject('tab 2', objCanvas.getDOMObject());
+  //objUITabsContent.fnAddTabWithObject('tab 2', objCanvas.getDOMObject());
 
   //objUITabsContent.fnRemoveTab(0);
   //let firstCanvas = new TCanvas(objUITabsContent);
