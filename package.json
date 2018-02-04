@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/hightemp/wpNodeMap#readme",
   "dependencies": {
-    "electron": "^1.7.10"
+    "electron": "^1.7.11"
   }
 }
