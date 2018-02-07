@@ -299,11 +299,24 @@ class TConnection {
 TConnection.aConnectionsCollection = [];
 */
 
-function TBlockManager() {
+function TBlockManager(in_objParent) {
+    var objRoot;
+    var objBlocks;
+    var objPorts;
+    var objConnections;
 
+    objRoot = in_objParent;
+
+    function fnCreateNode() {
+
+    }
+
+    return {
+        fnCreateNode: fnCreateNode
+      , fnCreateConnection: null
+      , fnCreatePort: null
+    }
 }
-
-var objBlockManager = new TBlockManager();
 
 class TPort {
   constructor(sName, fnOnConnect) {
@@ -498,6 +511,9 @@ window.fnGetCenterCoordinates = function()
 
 window.document.addEventListener("DOMContentLoaded", function()
 {
+  objPath = require("path");
+  objUtil = require(__dirname + "/js/util.js");
+
   var objDocumentBody = new TDocumentBody();
 
   //let objCanvas = new TCanvas();
@@ -505,6 +521,8 @@ window.document.addEventListener("DOMContentLoaded", function()
   let objUITabsContent = new TTabView(objDocumentBody);
   objUITabsContent.fnAddTabWithHTML('tab 1', '<a>link 1</a>');
   //objUITabsContent.fnAddTabWithObject('tab 2', objCanvas.getDOMObject());
+
+  var objBlockManager = new TBlockManager();
 
   //objUITabsContent.fnRemoveTab(0);
   //let firstCanvas = new TCanvas(objUITabsContent);
