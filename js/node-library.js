@@ -2,21 +2,11 @@
 
 var objIPCRenderer = require('electron').ipcRenderer;
 
-function TRandom() {
-  var aNumbers = [];
-
-  function getRandomID() {
-    let min = 0x11111111;
-    let max = 0xFFFFFFFF;
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
-
-  return {
-    getRandomID: getRandomID
-  }
+function fnGetRandomID() {
+  let min = 0x11111111;
+  let max = 0xFFFFFFFF;
+  return Math.floor(Math.random() * (max - min)) + min;
 }
-
-var objRandom = new TRandom();
 
 function TDocumentBody() {
   var aChildren = [];
@@ -307,7 +297,7 @@ function TBlockManager(in_objParent) {
 
     objRoot = in_objParent;
 
-    function fnCreateNode() {
+    function fnCreateNode(in_sName, in_sType) {
 
     }
 
